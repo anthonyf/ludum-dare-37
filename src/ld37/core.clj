@@ -4,23 +4,41 @@
            (com.badlogic.gdx.backends.lwjgl LwjglApplication
                                             LwjglApplicationConfiguration)
            (com.badlogic.gdx.graphics Color GL30 Texture)
-           (org.lwjgl.input Keyboard)))
+           (org.lwjgl.input Keyboard)
+           (com.badlogic.gdx.scenes.scene2d Stage)
+           (com.badlogic.gdx.utils.viewport FitViewport)))
 
 (def title "Catalingus")
 (def screen-size [1920 1080])
 
+(defn make-game-stage
+  []
+  (let [[screen-width screen-height] screen-size]
+    (proxy [Stage]
+        [(FitViewport. screen-width screen-height)])))
+
 (defn make-application
   []
-  (proxy [ApplicationAdapter]
-      []
-      (create []
-        (proxy-super create))
-      (render []
-        (.glClearColor Gdx/gl 0 0 0 1)
-        (.glClear Gdx/gl GL30/GL_COLOR_BUFFER_BIT))
-      (resize [width height])
-      (dispose []
-        (proxy-super dispose))))
+  (let [stage (atom nil)]
+    (proxy [ApplicationAdapter]
+        []
+        (create []
+          (proxy-super create)
+          (reset! stage (make-game-stage)))
+        (render []
+          (.glClearColor Gdx/gl 0 0 0 1)
+          (.glClear Gdx/gl GL30/GL_COLOR_BUFFER_BIT)
+          (doto @stage
+            .act
+            .draw))
+        (resize [width height]
+          (proxy-super resize width height)
+          (-> @stage
+              .getViewport
+              (.update width height true)))
+        (dispose []
+          (proxy-super dispose)
+          (.dispose @stage)))))
 
 (defn -main
   [& args]
