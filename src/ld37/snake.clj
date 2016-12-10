@@ -1,19 +1,43 @@
 (ns ld37.snake)
 
 (defn setup-game
-  [& {:keys [width height] :or {width 16 height 9}}]
+  [& {:keys [width height] :or {width (* 2 16) height (* 2 9)}}]
   (let [[start-x start-y :as start-xy] [(int (/ width 2)) (int (/ height 2))]]
     {:width width
      :height height
      :state :playing
      :direction :left
      :snake (list start-xy
-                  [(inc start-x) start-y])}))
+                  [(inc start-x) start-y])
+     :food #{}}))
 
 #_ (setup-game)
-;; => {:width 16, :height 9, :state :playing, :direction :left, :snake ([8 4] [9 4])}
+;; => {:width 32, :height 18, :state :playing, :direction :left, :snake ([16 9] [17 9])}
 
-(defn- move
+(defn- spawn-food
+  [{:keys [width height food snake]
+    amount :num-of-food-to-spawn
+    :as game}]
+  (-> game
+      ((fn [game]
+         (let [snake-positions (set snake)]
+           (loop [game game
+                  amount amount]
+             (if (zero? amount)
+               game
+               (let [food-pos [(rand-int width) (rand-int height)]]
+                 (if (or (contains? food food-pos)
+                         (contains? snake-positions food-pos))
+                   (recur game amount)
+                   (recur (-> game
+                              (update :food conj food-pos))
+                          (dec amount)))))))))))
+
+#_ (-> (setup-game)
+       (spawn-food)
+       (spawn-food))
+
+(defn move
   "dont make any turns, keep moving in same direction"
   [{:keys [snake width height] :as game} direction]
   (let [[[head-x head-y] & _] snake
@@ -38,7 +62,7 @@
 
 #_ (-> (setup-game)
        (move :left))
-;; => {:width 16, :height 9, :state :playing, :direction :left, :snake (7 4 [8 4])}
+;; => {:width 32, :height 18, :state :playing, :direction :left, :snake (15 9 [16 9])}
 
 (defn move-forward
   [{:keys [direction] :as game}]
@@ -46,3 +70,4 @@
 
 #_ (-> (setup-game)
        move-forward)
+;; => {:width 32, :height 18, :state :playing, :direction :left, :snake (15 9 [16 9]), :food #{}}
