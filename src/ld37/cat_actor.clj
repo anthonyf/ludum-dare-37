@@ -124,6 +124,24 @@
   [game]
   (let [tail-actor (proxy [Image] [(am/make-texture-drawable "images/tail.png")]
                      (act [delta]
+                       (let [{:keys [snake]} @game
+                             [tail-x tail-y :as tail-pos] (last snake)
+                             [prev-x prev-y :as prev-pos] (last (butlast snake))]
+                         (cond
+                           (< prev-x tail-x)
+
+                           (> prev-x tail-x)
+
+                           (> prev-y tail-y)
+
+                           (< prev-y tail-y)
+
+                           )
+                         (.setOrigin this
+                                     (/ (.getWidth this) 2)
+                                     (/ (.getHeight this) 2))
+                         (.setRotation this 0)
+                         (c/set-actor-game-position this tail-pos))
                        (proxy-super act delta)))]
     tail-actor))
 

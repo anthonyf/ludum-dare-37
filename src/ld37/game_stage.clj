@@ -30,7 +30,9 @@
     (reset! game (if next-move
                    (do (reset! data (assoc @data :next-move nil))
                        (snake/move @game next-move))
-                   (snake/move-forward @game)))))
+                   (snake/move-forward @game)))
+    (if (= :dead (:state game))
+      (println "DEAD"))))
 
 (defn update-game! [stage data game]
   (let [{:keys [::time-since-update]} @data

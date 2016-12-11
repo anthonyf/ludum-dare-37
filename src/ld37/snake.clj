@@ -1,6 +1,6 @@
 (ns ld37.snake)
 
-(declare spawn-food)
+(declare spawn-food move-forward)
 
 (defn setup-game
   [& {:keys [width height] :or {width 16 height 12}}]
@@ -47,29 +47,36 @@
     :as game}
    direction]
   (if (= state :playing)
-    (let [[[head-x head-y :as head] & _] snake
+    (let [[[head-x head-y :as head] & body] snake
+          [prev-x prev-y :as prev-pos] (first body)
           [nx ny :as new-head] (case direction
                                  :left [(- head-x 1) head-y]
                                  :right [(+ head-x 1) head-y]
                                  :up [head-x (+ head-y 1)]
                                  :down [head-x (- head-y 1)])]
-      (if (or (< nx 0)
-              (< ny 0)
-              (>= nx width)
-              (>= ny height)
-              (contains? (set snake) new-head))
-        ;; ran into something, die
-        (assoc game :state :dead)
-        (if (= food head)
-          (-> game
-              (assoc :food nil)
-              (assoc :snake (concat [new-head]
-                                    snake))
-              spawn-food)
-          (-> game
-              (assoc :direction direction)
-              (assoc :snake (concat [new-head]
-                                    (butlast snake)))))))
+      (if (= prev-pos new-head)
+        ;; going backwards not allowed, ignore and move forward
+        (move-forward game)
+
+        ;; move
+        (if (or (< nx 0)
+                (< ny 0)
+                (>= nx width)
+                (>= ny height)
+                (contains? (set snake) new-head))
+          ;; ran into something, die
+          (do (println "DEAD!" direction game)
+              (assoc game :state :dead))
+          (if (= food head)
+            (-> game
+                (assoc :food nil)
+                (assoc :snake (concat [new-head]
+                                      snake))
+                spawn-food)
+            (-> game
+                (assoc :direction direction)
+                (assoc :snake (concat [new-head]
+                                      (butlast snake))))))))
     game))
 
 
