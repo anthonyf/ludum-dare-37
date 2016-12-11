@@ -11,24 +11,28 @@
 (defn make-cat-head-actor!
   [game]
   (let [last-head-position (atom nil)
-        {:keys []} @game]
-    (proxy [Image] [(.get am/manager "images/head.png" Texture)]
-      (act [delta]
-        (let [{[[head-x head-y :as head-position] & _] :snake} @game
-              [screen-x screen-y] [(* c/tile-width head-x)
-                                   (* c/tile-width head-y)]]
-          (cond (nil? @last-head-position)
-                (do (.setPosition this screen-x screen-y)
-                    (reset! last-head-position head-position))
+        {:keys []} @game
+        head (proxy [Image] [(.get am/manager "images/head.png" Texture)]
+               (act [delta]
+                 (let [{[[head-x head-y :as head-position] & _] :snake} @game
+                       [screen-x screen-y] [(+ (- (* c/tile-width head-x)
+                                                  (/ (.getWidth this) 2))
+                                               (/ c/tile-width 2))
+                                            (+ (- (* c/tile-width head-y)
+                                                  (/ (.getHeight this) 2))
+                                               (/ c/tile-width 2))]]
+                   (cond (nil? @last-head-position)
+                         (do (.setPosition this screen-x screen-y)
+                             (reset! last-head-position head-position))
 
-                (not= @last-head-position head-position)
-                (do (.addAction this (Actions/moveTo screen-x screen-y c/game-speed))
-                    (reset! last-head-position head-position)
-                    (println "moving!"))
+                         (not= @last-head-position head-position)
+                         (do (.addAction this (Actions/moveTo screen-x screen-y c/game-speed))
+                             (reset! last-head-position head-position))
 
-                :else nil ;; do nothing, already animating
-                ))
-        (proxy-super act delta)))))
+                         ;; do nothing, already animating
+                         :else nil))
+                 (proxy-super act delta)))]
+    head))
 
 (defn make-cat-actor!
   [game]
