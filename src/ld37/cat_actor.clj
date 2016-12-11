@@ -31,18 +31,85 @@
 
 (defn make-body-tile!
   [game index]
-  (let [image (proxy [Image] [(am/make-texture-drawable "images/straight.png")]
+  (let [straight (am/make-texture-drawable "images/straight.png")
+        turn (am/make-texture-drawable "images/turn.png")
+        image (proxy [Image] [straight]
                 (act [delta]
                   (let [{:keys [snake]} @game
-                        [head & body] snake
-                        [x y] (nth body index)
-                        [screen-x screen-y][(+ (- (* c/tile-width x)
-                                                  (/ (.getWidth this) 2))
-                                               (/ c/tile-width 2))
-                                            (+ (- (* c/tile-width y)
-                                                  (/ (.getHeight this) 2))
-                                               (/ c/tile-width 2))]]
-                    (.setPosition this screen-x screen-y))))]
+                        body snake
+                        [x y :as pos] (nth body index)
+                        [prev-x prev-y :as prev-pos] (nth body (dec index))
+                        [next-x next-y :as next-pos] (nth body (inc index))]
+                    (cond
+                      ;; straight north/south
+                      (or (and (< prev-y y)
+                               (> next-y y))
+                          (and (> prev-y y)
+                               (< next-y y)))
+                      (do
+                        (.setDrawable this straight)
+                        (.setOrigin this
+                                    (/ (.getWidth this) 2)
+                                    (/ (.getHeight this) 2))
+                        (.setRotation this 0))
+
+                      ;; straight east/west
+                      (or (and (< prev-x x)
+                               (> next-x x))
+                          (and (> prev-x x)
+                               (< next-x x)))
+                      (do
+                        (.setDrawable this straight)
+                        (.setOrigin this
+                                    (/ (.getWidth this) 2)
+                                    (/ (.getHeight this) 2))
+                        (.setRotation this 90))
+
+                      ;; turn 1
+                      (or (and (< next-x x)
+                               (> prev-y y))
+                          (and (< prev-x x)
+                               (> next-y y)))
+                      (do (.setDrawable this turn)
+                          (.setOrigin this
+                                      (/ (.getWidth this) 2)
+                                      (/ (.getHeight this) 2))
+                          (.setRotation this (* 3 90)))
+
+                      ;; turn 2
+                      (or (and (> next-x x)
+                               (> prev-y y))
+                          (and (> prev-x x)
+                               (> next-y y)))
+                      (do (.setDrawable this turn)
+                          (.setOrigin this
+                                      (/ (.getWidth this) 2)
+                                      (/ (.getHeight this) 2))
+                          (.setRotation this (* 2 90)))
+
+                      ;; turn 3
+                      (or (and (> next-x x)
+                               (< prev-y y))
+                          (and (> prev-x x)
+                               (< next-y y)))
+                      (do (.setDrawable this turn)
+                          (.setOrigin this
+                                      (/ (.getWidth this) 2)
+                                      (/ (.getHeight this) 2))
+                          (.setRotation this 90))
+
+                      ;; turn 4
+                      (or (and (< next-x x)
+                               (< prev-y y))
+                          (and (< prev-x x)
+                               (< next-y y)))
+                      (do (.setDrawable this turn)
+                          (.setOrigin this
+                                      (/ (.getWidth this) 2)
+                                      (/ (.getHeight this) 2))
+                          (.setRotation this 0)))
+                    (c/set-actor-game-position this pos)
+                    (proxy-super act delta))))]
     image))
 
 (defn make-body-tiles!
@@ -51,11 +118,19 @@
         [head & body] snake]
     (mapv (fn [index]
             (make-body-tile! game index))
-          (range (count body)))))
+          (range 1 (dec (count body))))))
+
+(defn make-cat-tail-actor!
+  [game]
+  (let [tail-actor (proxy [Image] [(am/make-texture-drawable "images/tail.png")]
+                     (act [delta]
+                       (proxy-super act delta)))]
+    tail-actor))
 
 (defn make-cat-actor!
   [game]
   (let [head (make-cat-head-actor! game)
+        tail (make-cat-tail-actor! game)
         body-tiles (atom nil)
         cat-actor (proxy [Group] []
                     (act [delta]
@@ -63,13 +138,14 @@
                         (when-not (= (count @body-tiles) (count body))
                           ;; remove old body tiles
                           (when-not (empty? @body-tiles)
-                              (doseq [body-tile @body-tiles]
-                                (.remove body-tile))
-                              (reset! body-tiles nil))
+                            (doseq [body-tile @body-tiles]
+                              (.remove body-tile))
+                            (reset! body-tiles nil))
                           ;; add body tiles
                           (reset! body-tiles (make-body-tiles! game))
                           (doseq [body-tile @body-tiles]
                             (.addActorBefore this head body-tile))))
                       (proxy-super act delta)))]
+    (.addActor cat-actor tail)
     (.addActor cat-actor head)
     cat-actor))

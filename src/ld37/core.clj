@@ -14,6 +14,8 @@
 
 (def assets [["images/head.png" Texture]
              ["images/straight.png" Texture]
+             ["images/turn.png" Texture]
+             ["images/tail.png" Texture]
              ["images/spider.png" Texture]])
 
 (defn make-application
