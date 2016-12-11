@@ -24,7 +24,3 @@
 (defn make-texture-drawable
   [name]
   (TextureRegionDrawable. (TextureRegion. (.get manager name Texture))))
-
-
-(defn foo
-  [{}])

@@ -5,7 +5,8 @@
   (:require [ld37.common :as c]
             [ld37.snake :as snake]
             [ld37.room :as r]
-            [ld37.cat-actor :as ca]))
+            [ld37.cat-actor :as ca]
+            [ld37.food-actor :as f]))
 
 (defn input-direction [stage game]
   (cond
@@ -56,7 +57,9 @@
                   (draw []
                     (proxy-super draw)))
         room (r/make-room-actor @game)
-        cat (ca/make-cat-actor! game)]
+        cat (ca/make-cat-actor! game)
+        food (f/make-food-actor! game)]
     (.addActor stage room)
     (.addActor stage cat)
+    (.addActor stage food)
     stage))

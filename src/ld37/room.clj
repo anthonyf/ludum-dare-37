@@ -14,7 +14,7 @@
         (.setProjectionMatrix shape-renderer (.getProjectionMatrix batch))
         (.setTransformMatrix shape-renderer (.getTransformMatrix batch))
         (.translate shape-renderer (.getX this) (.getY this) 0)
-        (.setColor shape-renderer 1.0 0.0 0.0 parent-alpha)
+        (.setColor shape-renderer 1 1 1 parent-alpha)
         (.begin shape-renderer ShapeRenderer$ShapeType/Line)
         (.rect shape-renderer 0 0 c/tile-width c/tile-width)
         (.end shape-renderer)

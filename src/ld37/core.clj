@@ -12,7 +12,9 @@
             [ld37.snake :as snake]
             [ld37.game-stage :as gs]))
 
-(def assets [["images/head.png" Texture]])
+(def assets [["images/head.png" Texture]
+             ["images/straight.png" Texture]
+             ["images/spider.png" Texture]])
 
 (defn make-application
   []
@@ -31,7 +33,7 @@
           (reset! stage (gs/make-game-stage game))
           (.setInputProcessor Gdx/input @stage))
         (render []
-          (.glClearColor Gdx/gl 0 0 0 1)
+          (.glClearColor Gdx/gl 0 1 1 1)
           (.glClear Gdx/gl GL30/GL_COLOR_BUFFER_BIT)
           (doto @stage
             .act
