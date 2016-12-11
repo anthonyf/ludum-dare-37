@@ -20,3 +20,11 @@
     manager))
 
 (def manager (setup-asset-manager))
+
+(defn make-texture-drawable
+  [name]
+  (TextureRegionDrawable. (TextureRegion. (.get manager name Texture))))
+
+
+(defn foo
+  [{}])

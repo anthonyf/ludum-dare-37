@@ -45,7 +45,7 @@
           [nx ny :as new-head] (case direction
                                  :left [(- head-x 1) head-y]
                                  :right [(+ head-x 1) head-y]
-                                 :up [head-x (- head-y 1)]
+                                 :up [head-x (+ head-y 1)]
                                  :down [head-x (- head-y 1)])]
       (if (or (< nx 0)
               (< ny 0)
