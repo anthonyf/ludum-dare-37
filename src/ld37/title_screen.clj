@@ -10,7 +10,7 @@
             [ld37.game-stage :as gs]))
 
 (def title-color (Color. 1 1 1 1))
-(def selected-color (Color. 0xff6600ff))
+(def selected-color (Color. 1 0.4 0 1))
 
 (defn make-title-screen-stage
   [stage]

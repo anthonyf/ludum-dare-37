@@ -20,7 +20,7 @@
 * Stretch goals
   - [x] make cat grow faster
   - [x] animate spider (hands up/down or dancing)
-  - [ ] hair balls (as obstacles or bonus score)
+  - [x] hair balls (as obstacles or bonus score)
   - [ ] outer walls
   - [ ] cat animation on title screen
   - [ ] animate title menu text (zoom and rotate)
