@@ -8,7 +8,7 @@
 
 (def game-speed 0.25)
 
-(defn game-to-screen-pos
+(defn game-to-screen-pos-centered
   [actor [x y]]
   [(+ (- (* tile-width x)
          (/ (.getWidth actor) 2))
@@ -17,8 +17,14 @@
          (/ (.getHeight actor) 2))
       (/ tile-width 2))])
 
+(defn set-actor-game-position-centered
+  [actor game-pos]
+  (let [[x y] (game-to-screen-pos-centered actor game-pos)]
+    (.setPosition actor x y)))
+
 
 (defn set-actor-game-position
-  [actor game-pos]
-  (let [[x y] (game-to-screen-pos actor game-pos)]
+  [actor [x y :as game-pos]]
+  (let [[x y] [(* tile-width x)
+               (* tile-width y)]]
     (.setPosition actor x y)))

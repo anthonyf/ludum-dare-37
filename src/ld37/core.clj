@@ -10,13 +10,18 @@
   (:require [ld37.asset-manager :as am]
             [ld37.common :as c]
             [ld37.snake :as snake]
-            [ld37.game-stage :as gs]))
+            [ld37.game-stage :as gs]
+            [ld37.jukebox :as j]))
 
 (def assets [["images/head.png" Texture]
              ["images/straight.png" Texture]
              ["images/turn.png" Texture]
              ["images/tail.png" Texture]
              ["images/spider.png" Texture]])
+
+(def sounds [[:eat "sounds/chomp.mp3"]
+             [:dead "sounds/scream.mp3"]
+             [:meow "sounds/meow.mp3"]])
 
 (defn make-application
   []
@@ -31,6 +36,10 @@
           (doseq [[file type & [param]] assets]
             (.load am/manager file type param))
           (.finishLoading am/manager)
+
+          ;; load all sounds
+          (doseq [[sym path] sounds]
+            (j/load-sound! sym path))
 
           (reset! stage (gs/make-game-stage game))
           (.setInputProcessor Gdx/input @stage))

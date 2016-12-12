@@ -15,7 +15,7 @@
         head (proxy [Image] [(.get am/manager "images/head.png" Texture)]
                (act [delta]
                  (let [{[[head-x head-y :as head-position] & _] :snake} @game
-                       [screen-x screen-y] (c/game-to-screen-pos this head-position)]
+                       [screen-x screen-y] (c/game-to-screen-pos-centered this head-position)]
                    (cond (nil? @last-head-position)
                          (do (.setPosition this screen-x screen-y)
                              (reset! last-head-position head-position))
@@ -118,7 +118,7 @@
         [head & body] snake]
     (mapv (fn [index]
             (make-body-tile! game index))
-          (range 1 (dec (count body))))))
+          (range 1 (count body)))))
 
 (defn make-cat-tail-actor!
   [game]

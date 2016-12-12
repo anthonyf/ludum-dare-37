@@ -67,16 +67,16 @@
           ;; ran into something, die
           (do (println "DEAD!" direction game)
               (assoc game :state :dead))
-          (if (= food head)
-            (-> game
-                (assoc :food nil)
-                (assoc :snake (concat [new-head]
-                                      snake))
-                spawn-food)
-            (-> game
-                (assoc :direction direction)
-                (assoc :snake (concat [new-head]
-                                      (butlast snake))))))))
+          (-> (if (= food head)
+                (-> game
+                    (assoc :food nil)
+                    (assoc :snake (concat [new-head]
+                                          snake))
+                    spawn-food)
+                (-> game
+                    (assoc :snake (concat [new-head]
+                                          (butlast snake)))))
+              (assoc :direction direction)))))
     game))
 
 
