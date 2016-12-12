@@ -48,8 +48,9 @@
       (reset! data (assoc @data ::time-since-update elapsed-time)))))
 
 (defn make-game-stage
-  [game]
-  (let [data (atom {})
+  []
+  (let [game (atom (snake/setup-game))
+        data (atom {})
         [screen-width screen-height] c/screen-size
         stage (proxy [Stage]
                   [(FitViewport. screen-width screen-height)]

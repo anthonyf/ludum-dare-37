@@ -10,8 +10,8 @@
   (:require [ld37.asset-manager :as am]
             [ld37.common :as c]
             [ld37.snake :as snake]
-            [ld37.game-stage :as gs]
-            [ld37.jukebox :as j]))
+            [ld37.jukebox :as j]
+            [ld37.title-screen :as ts]))
 
 (def assets [["images/head.png" Texture]
              ["images/straight.png" Texture]
@@ -25,8 +25,7 @@
 
 (defn make-application
   []
-  (let [game (atom (snake/setup-game))
-        stage (atom nil)]
+  (let [stage (atom nil)]
     (proxy [ApplicationAdapter]
         []
         (create []
@@ -41,7 +40,8 @@
           (doseq [[sym path] sounds]
             (j/load-sound! sym path))
 
-          (reset! stage (gs/make-game-stage game))
+          (reset! stage
+                  (ts/make-title-screen-stage stage))
           (.setInputProcessor Gdx/input @stage))
         (render []
           (.glClearColor Gdx/gl 0 1 1 1)
