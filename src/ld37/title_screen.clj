@@ -17,6 +17,7 @@
   (let [[screen-width screen-height] c/screen-size
         font140 (f/gen-font "fonts/garfield.ttf" 140 title-color)
         font80 (f/gen-font "fonts/garfield.ttf" 80 title-color)
+        font60 (f/gen-font "fonts/garfield.ttf" 40 title-color)
         play-label (Label. "Play!" (Label$LabelStyle. font80 title-color))
         exit-label (Label. "Quit" (Label$LabelStyle. font80 title-color))
         selected-menu-item (atom play-label)
@@ -47,20 +48,28 @@
                     (proxy-super act))
                   (draw []
                     (proxy-super draw)))
-        title (Label. c/title (Label$LabelStyle. font140 title-color))]
+        title (Label. c/title (Label$LabelStyle. font140 title-color))
+        subtitle (Label. c/subtitle (Label$LabelStyle. font60 title-color))]
     (.setColor play-label selected-color)
     (.addActor stage title)
+    (.addActor stage subtitle)
     (.addActor stage play-label)
     (.addActor stage exit-label)
     (.setPosition title
                   (- (/ screen-width 2)
                      (/ (.getWidth title) 2))
-                  (- (* screen-height 0.7)
+                  (- (* screen-height 0.8)
                      (/ (.getHeight title) 2)))
+    (.setPosition subtitle
+                  (- (/ screen-width 2)
+                     (/ (.getWidth subtitle) 2))
+                  (- (.getY title)
+                     (+ (.getHeight subtitle)
+                        (* 0.4 (.getHeight subtitle)))))
     (.setPosition play-label
                   (- (/ screen-width 2)
                      (/ (.getWidth play-label) 2))
-                  (- (* screen-height 0.5)
+                  (- (* screen-height 0.4)
                      (/ (.getHeight play-label) 2)))
     (.setPosition exit-label
                   (- (/ screen-width 2)
