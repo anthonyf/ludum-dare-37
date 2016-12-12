@@ -17,7 +17,8 @@
              ["images/straight.png" Texture]
              ["images/turn.png" Texture]
              ["images/tail.png" Texture]
-             ["images/spider.png" Texture]])
+             ["images/spider.png" Texture]
+             ["images/crash.png" Texture]])
 
 (def sounds [[:eat "sounds/chomp.mp3"]
              [:dead "sounds/scream.mp3"]

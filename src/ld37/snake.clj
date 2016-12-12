@@ -65,8 +65,7 @@
                 (>= ny height)
                 (contains? (set snake) new-head))
           ;; ran into something, die
-          (do (println "DEAD!" direction game)
-              (assoc game :state :dead))
+          (assoc game :state :dead)
           (-> (if (= food head)
                 (-> game
                     (assoc :food nil)

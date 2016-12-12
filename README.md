@@ -7,13 +7,16 @@
 * MVP
   - [x] basic game working
   - [x] cat tiles rendering
-  - [ ] title screen
+  - [x] title screen
+  - [ ] crash animation
   - [ ] game over screen
+
+* Nice to haves
+  - [ ] make cat grow faster
   - [ ] score
-  - [ ] leader board
+  - [ ] score board
 
 * Stretch goals
-  - [ ] make cat grow faster
   - [ ] animate spider (hands up/down or dancing)
   - [ ] animate cat eating
   - [ ] obstacles

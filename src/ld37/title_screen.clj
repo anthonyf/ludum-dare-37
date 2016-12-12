@@ -35,7 +35,11 @@
 
                           (.isKeyJustPressed Gdx/input Input$Keys/ENTER)
                           (cond (= @selected-menu-item play-label)
-                                (do (reset! stage (gs/make-game-stage))
+                                (do (reset! stage (gs/make-game-stage
+                                                   (fn []
+                                                     (reset! stage
+                                                             (make-title-screen-stage stage))
+                                                     (.setInputProcessor Gdx/input @stage))))
                                     (.setInputProcessor Gdx/input @stage))
 
                                 (= @selected-menu-item exit-label)
