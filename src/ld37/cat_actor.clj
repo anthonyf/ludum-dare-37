@@ -4,7 +4,10 @@
                                             Group)
            (com.badlogic.gdx.scenes.scene2d.ui Image)
            (com.badlogic.gdx.scenes.scene2d.actions Actions
-                                                    MoveToAction))
+                                                    MoveToAction
+                                                    RotateToAction
+                                                    RotateByAction
+                                                    ParallelAction))
   (:require [ld37.asset-manager :as am]
             [ld37.common :as c]))
 
@@ -120,6 +123,13 @@
             (make-body-tile! game index))
           (range 1 (count body)))))
 
+(defn- set-centered-rotation
+  [actor d]
+  (.setOrigin actor
+              (/ c/tile-width 2)
+              (/ c/tile-width 2))
+  (.setRotation actor d))
+
 (defn make-cat-tail-actor!
   [game]
   (let [left-image (am/make-texture-drawable "images/tail.png")
@@ -132,18 +142,12 @@
                          (cond
                            (< prev-x tail-x)
                            (do (.setDrawable this left-image)
-                               (.setOrigin this
-                                           (/ c/tile-width 2)
-                                           (/ c/tile-width 2))
-                               (.setRotation this 0)
+                               (set-centered-rotation this 0)
                                (c/set-actor-game-position this tail-pos))
 
                            (> prev-x tail-x)
                            (do (.setDrawable this right-image)
-                               (.setOrigin this
-                                           (/ c/tile-width 2)
-                                           (/ c/tile-width 2))
-                               (.setRotation this 0)
+                               (set-centered-rotation this 0)
                                (.setPosition this
                                              (- (* c/tile-width tail-x)
                                                 (- (.getWidth this)
@@ -152,30 +156,143 @@
 
                            (> prev-y tail-y)
                            (do (.setDrawable this left-image)
-                               (.setOrigin this
-                                           (/ c/tile-width 2)
-                                           (/ c/tile-width 2))
-                               (.setRotation this -90)
+                               (set-centered-rotation this -90)
                                (c/set-actor-game-position this tail-pos))
 
                            (< prev-y tail-y)
                            (do (.setDrawable this left-image)
-                               (.setOrigin this
-                                           (/ c/tile-width 2)
-                                           (/ c/tile-width 2))
-                               (.setRotation this 90)
+                               (set-centered-rotation this 90)
                                (c/set-actor-game-position this tail-pos))))
                        (proxy-super act delta)))]
     tail-actor))
 
+(defn- rotate-and-move-to
+  [actor d [x y]]
+  (let [speed (* 2 c/game-speed)
+        current-rotation (.getRotation actor)
+        d (if (> (Math/abs (- current-rotation d))
+                 180)
+            (- d 360)
+            d)
+        action (Actions/parallel (Actions/rotateTo d speed)
+                                 (Actions/moveTo (* c/tile-width x)
+                                                 (* c/tile-width y)
+                                                 speed))]
+    (.setOrigin actor
+                (/ c/tile-width 2)
+                (/ c/tile-width 2))
+    (.addAction actor action)))
+
+
+(defn- move-to
+  [actor [x y]]
+  (.addAction actor
+              (Actions/moveTo (* c/tile-width x)
+                              (* c/tile-width y)
+                              (* 2 c/game-speed))))
+
 (defn make-paws-actor!
   [game]
-  (let [paws (proxy [Image] [(am/make-texture-drawable "images/paws.png")]
+  (let [{:keys [snake]} @game
+        [[pos-x pos-y :as pos] & _] snake
+        paws (proxy [Image] [(am/make-texture-drawable "images/paws.png")]
                (act [delta]
                  (let [{:keys [snake]} @game
-                       [pos-x pos-y :as pos] (nth snake 1)]
-                   (c/set-actor-game-position this pos))
+                       [[head-x head-y :as head-pos]
+                        [pos-x pos-y :as pos]
+                        [next-x next-y :as next-pos]& _] snake]
+                   (cond
+                     ;; left
+                     (and (> next-x pos-x head-x)
+                          (= head-y pos-y next-y))
+                     (do (println "left")
+                         (move-to this pos))
+
+                     ;; right
+                     (and (< next-x pos-x head-x)
+                          (= head-y pos-y next-y))
+                     (do (println "right")
+                         (move-to this pos))
+
+                     ;; down
+                     (and (< head-y pos-y next-y)
+                          (= head-x pos-x next-x))
+                     (do (println "down")
+                         (move-to this pos))
+
+                     ;; up
+                     (and (> head-y pos-y next-y)
+                          (= head-x pos-x next-x))
+                     (do (println "up")
+                         (move-to this pos))
+
+                     ;; up right
+                     (and (= head-y pos-y)
+                          (> pos-y next-y)
+                          (> head-x pos-x)
+                          (= pos-x next-x))
+                     (do (println "up right")
+                         (rotate-and-move-to this 180 pos))
+
+                     ;; up left
+                     (and (= head-y pos-y)
+                          (> pos-y next-y)
+                          (< head-x pos-x)
+                          (= pos-x next-x))
+                     (do (println "up left")
+                         (rotate-and-move-to this 360 pos))
+
+                     ;; down left
+                     (and (= head-y pos-y)
+                          (< pos-y next-y)
+                          (< head-x pos-x)
+                          (= pos-x next-x))
+                     (do (println "down left")
+                         (rotate-and-move-to this 0 pos))
+
+                     ;; down right
+                     (and (= head-y pos-y)
+                          (< pos-y next-y)
+                          (> head-x pos-x)
+                          (= pos-x next-x))
+                     (do (println "down right")
+                         (rotate-and-move-to this 180 pos))
+
+                     ;; right up
+                     (and (= head-x pos-x)
+                          (> pos-x next-x)
+                          (> head-y pos-y)
+                          (= pos-y next-y))
+                     (do (println "right up")
+                         (rotate-and-move-to this 270 pos))
+
+                     ;; right down
+                     (and (= head-x pos-x)
+                          (> pos-x next-x)
+                          (< head-y pos-y)
+                          (= pos-y next-y))
+                     (do (println "right down")
+                         (rotate-and-move-to this 90 pos))
+
+                     ;; left down
+                     (and (= head-x pos-x)
+                          (< pos-x next-x)
+                          (< head-y pos-y)
+                          (= pos-y next-y))
+                     (do (println "left down")
+                         (rotate-and-move-to this 90 pos))
+
+                     ;; left up
+                     (and (= head-x pos-x)
+                          (< pos-x next-x)
+                          (> head-y pos-y)
+                          (= pos-y next-y))
+                     (do (println "left up")
+                         (rotate-and-move-to this 270 pos))
+
+                     :else (println "unhandled case" head-pos pos next-pos)))
                  (proxy-super act delta)))]
+    (c/set-actor-game-position paws pos)
     paws))
 
 (defn make-cat-actor!

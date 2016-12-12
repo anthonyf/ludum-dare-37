@@ -6,14 +6,22 @@
 
 * MVP
   - [x] basic game working
-  - [x] cat tiles rendering
+  - [x] render cat tiles
+      - [x] head
+      - [x] tail
+      - [x] body
+      - [x] cat paws
   - [x] title screen
   - [x] crash animation
-  - [ ] cat paws
+
+* Bugs
+  - [ ] cat paws sometimes spin around
 
 * Stretch goals
-  - [ ] cat animation on title screen
   - [ ] make cat grow faster
+  - [ ] outer walls
+  - [ ] cat animation on title screen
+  - [ ] animate title menu text (zoom and rotate)
   - [ ] score
   - [ ] game over (enter initials) screen
   - [ ] score board
