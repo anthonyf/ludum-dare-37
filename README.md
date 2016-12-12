@@ -19,6 +19,7 @@
 
 * Stretch goals
   - [x] make cat grow faster
+  - [x] animate spider (hands up/down or dancing)
   - [ ] hair balls (as obstacles or bonus score)
   - [ ] outer walls
   - [ ] cat animation on title screen
@@ -26,7 +27,7 @@
   - [ ] score
   - [ ] game over (enter initials) screen
   - [ ] score board
-  - [ ] animate spider (hands up/down or dancing)
   - [ ] animate cat eating
   - [ ] obstacles
   - [ ] nine lives
+  - [ ] game music

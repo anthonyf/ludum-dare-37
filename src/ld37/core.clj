@@ -25,7 +25,8 @@
 
 (def sounds [[:eat "sounds/chomp.mp3"]
              [:dead "sounds/scream.mp3"]
-             [:meow "sounds/meow.mp3"]])
+             [:meow "sounds/meow.mp3"]
+             [:hairball "sounds/hairball.wav"]])
 
 (defn make-application
   []
