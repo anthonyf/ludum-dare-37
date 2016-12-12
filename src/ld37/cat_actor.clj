@@ -6,7 +6,6 @@
            (com.badlogic.gdx.scenes.scene2d.actions Actions
                                                     MoveToAction
                                                     RotateToAction
-                                                    RotateByAction
                                                     ParallelAction))
   (:require [ld37.asset-manager :as am]
             [ld37.common :as c]))
