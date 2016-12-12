@@ -76,7 +76,6 @@
     (if (empty? valid-positions)
       game
       (let [hairball-pos (rand-nth valid-positions)]
-        (println "spawned hairball pos= " (rand-nth valid-positions) "game = " game)
         (update game :hairballs conj hairball-pos)))))
 
 (defn- update-hairballs
@@ -126,8 +125,8 @@
                        (update :grow dec))
                    (assoc game :snake (concat [new-head]
                                               (butlast snake))))))
-              (assoc :direction direction)
-              update-hairballs))))
+              update-hairballs
+              (assoc :direction direction)))))
     game))
 
 

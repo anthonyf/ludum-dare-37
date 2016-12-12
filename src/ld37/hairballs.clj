@@ -18,7 +18,6 @@
                             (let [{:keys [hairballs]} @game]
                               (when (not= (count @hairball-actors)
                                           (count hairballs))
-                                (println "doing it")
                                 (doseq [hairball-actor @hairball-actors]
                                   (.remove hairball-actor))
                                 (reset! hairball-actors
