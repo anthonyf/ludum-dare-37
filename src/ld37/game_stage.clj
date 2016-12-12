@@ -12,7 +12,8 @@
             [ld37.cat-actor :as ca]
             [ld37.food-actor :as f]
             [ld37.asset-manager :as am]
-            [ld37.jukebox :as j]))
+            [ld37.jukebox :as j]
+            [ld37.hairballs :as h]))
 
 (defn input-direction [stage game]
   (cond
@@ -90,8 +91,10 @@
                     (proxy-super draw)))
         room (r/make-room-actor @game)
         cat (ca/make-cat-actor! game)
+        hairballs (h/make-hairballs! game)
         food (f/make-food-actor! game)]
     (.addActor stage room)
     (.addActor stage cat)
     (.addActor stage food)
+    (.addActor stage hairballs)
     stage))

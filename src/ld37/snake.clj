@@ -29,9 +29,9 @@
   [{:keys [food snake hairballs]}
    [x y :as place]]
   (let [snake-positions (set snake)]
-    (or (contains? food place)
-        (contains? snake-positions place)
-        (contains? hairballs place))))
+    (not (or (= food place)
+             (contains? snake-positions place)
+             (contains? hairballs place)))))
 
 (defn- spawn-food
   [{:keys [width height food]
@@ -41,13 +41,12 @@
     (loop []
       (let [food-pos [(rand-int width) (rand-int height)]]
         (if (empty-place? game food-pos)
-          (recur)
-          (assoc game :food food-pos))))))
+          (assoc game :food food-pos)
+          (recur))))))
 
 #_ (-> (setup-game)
        (spawn-food)
        (spawn-food))
-
 
 (defn- eat-food
   [{:keys [food snake grow-by] :as game}]
@@ -60,12 +59,33 @@
       game)))
 
 (defn- spawn-hairball
-  [game]
-  )
+  [{:keys [direction]
+    [[head-x head-y :as head-pos] & _] :snake
+    :as game}]
+  (let [valid-positions (filter (fn [[x y :as pos]]
+                                  (and (empty-place? game pos)
+                                       (not= pos (case direction
+                                                   :left [(- head-x 1) head-y]
+                                                   :right [(+ head-x 1) head-y]
+                                                   :up [head-x (+ head-y 1)]
+                                                   :down [head-x (- head-y 1)]))))
+                                [[(inc head-x) head-y]
+                                 [(dec head-x) head-y]
+                                 [head-x (inc head-y)]
+                                 [head-x (dec head-y)]])]
+    (if (empty? valid-positions)
+      game
+      (let [hairball-pos (rand-nth valid-positions)]
+        (println "spawned hairball pos= " (rand-nth valid-positions) "game = " game)
+        (update game :hairballs conj hairball-pos)))))
 
 (defn- update-hairballs
-  [game]
-  game)
+  [{:keys [hairball-delay hairball-countdown hairballs] :as game}]
+  (let [spawn? (zero? hairball-countdown)]
+    (cond-> game
+      spawn? (-> spawn-hairball
+                 (assoc :hairball-countdown (+ hairball-delay (rand-int hairball-delay))))
+      (not spawn?) (-> (update :hairball-countdown dec)))))
 
 (defn move
   "dont make any turns, keep moving in same direction"
@@ -98,7 +118,6 @@
           ;; otherwise
           (-> game
               eat-food
-              update-hairballs
               ((fn [{:keys [grow] :as game}]
                  (if (> grow 0)
                    (-> game
@@ -107,7 +126,8 @@
                        (update :grow dec))
                    (assoc game :snake (concat [new-head]
                                               (butlast snake))))))
-              (assoc :direction direction)))))
+              (assoc :direction direction)
+              update-hairballs))))
     game))
 
 
