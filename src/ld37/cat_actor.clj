@@ -168,16 +168,17 @@
 
 (defn- rotate-and-move-to
   [actor d [x y]]
-  (let [speed (* 2 c/game-speed)
-        current-rotation (.getRotation actor)
-        d (if (> (Math/abs (- current-rotation d))
-                 180)
+  (let [current-rotation (.getRotation actor)
+        original-rotation d
+        rotation-difference (Math/abs (- current-rotation d))
+        d (if (> rotation-difference 180)
             (- d 360)
             d)
-        action (Actions/parallel (Actions/rotateTo d speed)
+        action (Actions/parallel (Actions/rotateTo d c/game-speed)
                                  (Actions/moveTo (* c/tile-width x)
                                                  (* c/tile-width y)
-                                                 speed))]
+                                                 c/game-speed))]
+    (println current-rotation original-rotation rotation-difference)
     (.setOrigin actor
                 (/ c/tile-width 2)
                 (/ c/tile-width 2))
@@ -189,11 +190,12 @@
   (.addAction actor
               (Actions/moveTo (* c/tile-width x)
                               (* c/tile-width y)
-                              (* 2 c/game-speed))))
+                              c/game-speed)))
 
 (defn make-paws-actor!
   [game]
-  (let [{:keys [snake]} @game
+  (let [last-position (atom nil)
+        {:keys [snake]} @game
         [[pos-x pos-y :as pos] & _] snake
         paws (proxy [Image] [(am/make-texture-drawable "images/paws.png")]
                (act [delta]
@@ -201,96 +203,101 @@
                        [[head-x head-y :as head-pos]
                         [pos-x pos-y :as pos]
                         [next-x next-y :as next-pos]& _] snake]
-                   (cond
-                     ;; left
-                     (and (> next-x pos-x head-x)
-                          (= head-y pos-y next-y))
-                     (do (println "left")
-                         (move-to this pos))
+                   (cond (nil? @last-position)
+                         (reset! last-position pos)
 
-                     ;; right
-                     (and (< next-x pos-x head-x)
-                          (= head-y pos-y next-y))
-                     (do (println "right")
-                         (move-to this pos))
+                         (not= @last-position pos)
+                         (do (reset! last-position pos)
+                             (cond
+                               ;; left
+                               (and (> next-x pos-x head-x)
+                                    (= head-y pos-y next-y))
+                               (do (println "left")
+                                   (move-to this pos))
 
-                     ;; down
-                     (and (< head-y pos-y next-y)
-                          (= head-x pos-x next-x))
-                     (do (println "down")
-                         (move-to this pos))
+                               ;; right
+                               (and (< next-x pos-x head-x)
+                                    (= head-y pos-y next-y))
+                               (do (println "right")
+                                   (move-to this pos))
 
-                     ;; up
-                     (and (> head-y pos-y next-y)
-                          (= head-x pos-x next-x))
-                     (do (println "up")
-                         (move-to this pos))
+                               ;; down
+                               (and (< head-y pos-y next-y)
+                                    (= head-x pos-x next-x))
+                               (do (println "down")
+                                   (move-to this pos))
 
-                     ;; up right
-                     (and (= head-y pos-y)
-                          (> pos-y next-y)
-                          (> head-x pos-x)
-                          (= pos-x next-x))
-                     (do (println "up right")
-                         (rotate-and-move-to this 180 pos))
+                               ;; up
+                               (and (> head-y pos-y next-y)
+                                    (= head-x pos-x next-x))
+                               (do (println "up")
+                                   (move-to this pos))
 
-                     ;; up left
-                     (and (= head-y pos-y)
-                          (> pos-y next-y)
-                          (< head-x pos-x)
-                          (= pos-x next-x))
-                     (do (println "up left")
-                         (rotate-and-move-to this 360 pos))
+                               ;; up right
+                               (and (= head-y pos-y)
+                                    (> pos-y next-y)
+                                    (> head-x pos-x)
+                                    (= pos-x next-x))
+                               (do (println "up right")
+                                   (rotate-and-move-to this 180 pos))
 
-                     ;; down left
-                     (and (= head-y pos-y)
-                          (< pos-y next-y)
-                          (< head-x pos-x)
-                          (= pos-x next-x))
-                     (do (println "down left")
-                         (rotate-and-move-to this 0 pos))
+                               ;; up left
+                               (and (= head-y pos-y)
+                                    (> pos-y next-y)
+                                    (< head-x pos-x)
+                                    (= pos-x next-x))
+                               (do (println "up left")
+                                   (rotate-and-move-to this 360 pos))
 
-                     ;; down right
-                     (and (= head-y pos-y)
-                          (< pos-y next-y)
-                          (> head-x pos-x)
-                          (= pos-x next-x))
-                     (do (println "down right")
-                         (rotate-and-move-to this 180 pos))
+                               ;; down left
+                               (and (= head-y pos-y)
+                                    (< pos-y next-y)
+                                    (< head-x pos-x)
+                                    (= pos-x next-x))
+                               (do (println "down left")
+                                   (rotate-and-move-to this 0 pos))
 
-                     ;; right up
-                     (and (= head-x pos-x)
-                          (> pos-x next-x)
-                          (> head-y pos-y)
-                          (= pos-y next-y))
-                     (do (println "right up")
-                         (rotate-and-move-to this 270 pos))
+                               ;; down right
+                               (and (= head-y pos-y)
+                                    (< pos-y next-y)
+                                    (> head-x pos-x)
+                                    (= pos-x next-x))
+                               (do (println "down right")
+                                   (rotate-and-move-to this 180 pos))
 
-                     ;; right down
-                     (and (= head-x pos-x)
-                          (> pos-x next-x)
-                          (< head-y pos-y)
-                          (= pos-y next-y))
-                     (do (println "right down")
-                         (rotate-and-move-to this 90 pos))
+                               ;; right up
+                               (and (= head-x pos-x)
+                                    (> pos-x next-x)
+                                    (> head-y pos-y)
+                                    (= pos-y next-y))
+                               (do (println "right up")
+                                   (rotate-and-move-to this 270 pos))
 
-                     ;; left down
-                     (and (= head-x pos-x)
-                          (< pos-x next-x)
-                          (< head-y pos-y)
-                          (= pos-y next-y))
-                     (do (println "left down")
-                         (rotate-and-move-to this 90 pos))
+                               ;; right down
+                               (and (= head-x pos-x)
+                                    (> pos-x next-x)
+                                    (< head-y pos-y)
+                                    (= pos-y next-y))
+                               (do (println "right down")
+                                   (rotate-and-move-to this 90 pos))
 
-                     ;; left up
-                     (and (= head-x pos-x)
-                          (< pos-x next-x)
-                          (> head-y pos-y)
-                          (= pos-y next-y))
-                     (do (println "left up")
-                         (rotate-and-move-to this 270 pos))
+                               ;; left down
+                               (and (= head-x pos-x)
+                                    (< pos-x next-x)
+                                    (< head-y pos-y)
+                                    (= pos-y next-y))
+                               (do (println "left down")
+                                   (rotate-and-move-to this 90 pos))
 
-                     :else (println "unhandled case" head-pos pos next-pos)))
+                               ;; left up
+                               (and (= head-x pos-x)
+                                    (< pos-x next-x)
+                                    (> head-y pos-y)
+                                    (= pos-y next-y))
+                               (do (println "left up")
+                                   (rotate-and-move-to this 270 pos))
+
+                               :else (println "unhandled case" head-pos pos next-pos)))))
                  (proxy-super act delta)))]
     (c/set-actor-game-position paws pos)
     paws))

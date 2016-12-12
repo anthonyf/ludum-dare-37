@@ -15,7 +15,7 @@
   - [x] crash animation
 
 * Bugs
-  - [ ] cat paws sometimes spin around
+  - [x] cat paws sometimes spin around
 
 * Stretch goals
   - [ ] make cat grow faster
