@@ -5,7 +5,8 @@
 (defn setup-game
   [& {:keys [width height] :or {width 16 height 12}}]
   (let [[start-x start-y :as start-xy] [(int (/ width 2))
-                                        (int (/ height 2))]]
+                                        (int (/ height 2))]
+        hairball-delay 15]
     (-> {:width width
          :height height
          :state :playing
@@ -14,6 +15,9 @@
                       [(+ 1 start-x) start-y]
                       [(+ 2 start-x) start-y])
          :food nil
+         :hairball-delay hairball-delay
+         :hairball-countdown (+ hairball-delay (rand-int hairball-delay))
+         :hairballs #{}
          :grow-by 2
          :grow 0}
         spawn-food)))
@@ -22,11 +26,12 @@
 ;; => {:width 16, :height 12, :state :playing, :direction :left, :snake ([8 6] [9 6] [10 6]), :food [1 11]}
 
 (defn empty-place?
-  [{:keys [food snake]}
+  [{:keys [food snake hairballs]}
    [x y :as place]]
   (let [snake-positions (set snake)]
     (or (contains? food place)
-        (contains? snake-positions place))))
+        (contains? snake-positions place)
+        (contains? hairballs place))))
 
 (defn- spawn-food
   [{:keys [width height food]
@@ -43,9 +48,28 @@
        (spawn-food)
        (spawn-food))
 
+
+(defn- eat-food
+  [{:keys [food snake grow-by] :as game}]
+  (let [[[head-x head-y :as head] & body] snake]
+    (if (= food head)
+      (-> game
+          (assoc :food nil)
+          (update :grow (fn [grow] (+ grow grow-by)))
+          spawn-food)
+      game)))
+
+(defn- spawn-hairball
+  [game]
+  )
+
+(defn- update-hairballs
+  [game]
+  game)
+
 (defn move
   "dont make any turns, keep moving in same direction"
-  [{:keys [state snake width height]
+  [{:keys [state snake width height hairballs]
     [food-x food-y :as food] :food
     :as game}
    direction]
@@ -66,17 +90,15 @@
                 (< ny 0)
                 (>= nx width)
                 (>= ny height)
-                (contains? (set snake) new-head))
+                (contains? (set snake) new-head)
+                (contains? hairballs new-head))
           ;; ran into something, die
           (assoc game :state :dead)
+
+          ;; otherwise
           (-> game
-              ((fn [{:keys [grow-by] :as game}]
-                 (if (= food head)
-                   (-> game
-                       (assoc :food nil)
-                       (update :grow (fn [grow] (+ grow grow-by)))
-                       spawn-food)
-                   game)))
+              eat-food
+              update-hairballs
               ((fn [{:keys [grow] :as game}]
                  (if (> grow 0)
                    (-> game
