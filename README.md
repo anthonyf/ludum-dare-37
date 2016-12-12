@@ -9,8 +9,10 @@
   - [x] cat tiles rendering
   - [x] title screen
   - [x] crash animation
+  - [ ] cat paws
 
 * Stretch goals
+  - [ ] cat animation on title screen
   - [ ] make cat grow faster
   - [ ] score
   - [ ] game over (enter initials) screen

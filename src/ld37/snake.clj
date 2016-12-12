@@ -4,19 +4,20 @@
 
 (defn setup-game
   [& {:keys [width height] :or {width 16 height 12}}]
-  (let [[start-x start-y :as start-xy] [(int (/ width 2)) (int (/ height 2))]]
+  (let [[start-x start-y :as start-xy] [(int (/ width 2))
+                                        (int (/ height 2))]]
     (-> {:width width
          :height height
          :state :playing
          :direction :left
          :snake (list start-xy
-                      [(inc start-x) start-y])
+                      [(+ 1 start-x) start-y]
+                      [(+ 2 start-x) start-y])
          :food nil}
         spawn-food)))
 
 #_ (setup-game)
-;; => {:width 32, :height 18, :state :playing, :direction :left, :snake ([16 9] [17 9])}
-
+;; => {:width 16, :height 12, :state :playing, :direction :left, :snake ([8 6] [9 6] [10 6]), :food [1 11]}
 
 (defn empty-place?
   [{:keys [food snake]}

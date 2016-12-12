@@ -168,11 +168,16 @@
                        (proxy-super act delta)))]
     tail-actor))
 
+(defn make-paws-actor!
+  [game]
+  (proxy [Group] []))
+
 (defn make-cat-actor!
   [game]
   (let [head (make-cat-head-actor! game)
         tail (make-cat-tail-actor! game)
         body-tiles (atom nil)
+        paws-actor (make-paws-actor! game)
         cat-actor (proxy [Group] []
                     (act [delta]
                       (let [{[_ & body] :snake} @game]
@@ -188,5 +193,6 @@
                             (.addActorBefore this head body-tile))))
                       (proxy-super act delta)))]
     (.addActor cat-actor tail)
+    (.addActor cat-actor paws-actor)
     (.addActor cat-actor head)
     cat-actor))
