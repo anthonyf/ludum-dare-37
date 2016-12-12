@@ -122,26 +122,49 @@
 
 (defn make-cat-tail-actor!
   [game]
-  (let [tail-actor (proxy [Image] [(am/make-texture-drawable "images/tail.png")]
+  (let [left-image (am/make-texture-drawable "images/tail.png")
+        right-image (am/make-texture-drawable-flip "images/tail.png" true false)
+        tail-actor (proxy [Image] [left-image]
                      (act [delta]
                        (let [{:keys [snake]} @game
                              [tail-x tail-y :as tail-pos] (last snake)
                              [prev-x prev-y :as prev-pos] (last (butlast snake))]
                          (cond
                            (< prev-x tail-x)
+                           (do (.setDrawable this left-image)
+                               (.setOrigin this
+                                           (/ c/tile-width 2)
+                                           (/ c/tile-width 2))
+                               (.setRotation this 0)
+                               (c/set-actor-game-position this tail-pos))
 
                            (> prev-x tail-x)
+                           (do (.setDrawable this right-image)
+                               (.setOrigin this
+                                           (/ c/tile-width 2)
+                                           (/ c/tile-width 2))
+                               (.setRotation this 0)
+                               (.setPosition this
+                                             (- (* c/tile-width tail-x)
+                                                (- (.getWidth this)
+                                                   c/tile-width))
+                                             (* c/tile-width tail-y)))
 
                            (> prev-y tail-y)
+                           (do (.setDrawable this left-image)
+                               (.setOrigin this
+                                           (/ c/tile-width 2)
+                                           (/ c/tile-width 2))
+                               (.setRotation this -90)
+                               (c/set-actor-game-position this tail-pos))
 
                            (< prev-y tail-y)
-
-                           )
-                         (.setOrigin this
-                                     (/ (.getWidth this) 2)
-                                     (/ (.getHeight this) 2))
-                         (.setRotation this 0)
-                         (c/set-actor-game-position this tail-pos))
+                           (do (.setDrawable this left-image)
+                               (.setOrigin this
+                                           (/ c/tile-width 2)
+                                           (/ c/tile-width 2))
+                               (.setRotation this 90)
+                               (c/set-actor-game-position this tail-pos))))
                        (proxy-super act delta)))]
     tail-actor))
 

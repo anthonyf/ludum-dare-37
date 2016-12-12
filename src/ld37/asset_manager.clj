@@ -24,3 +24,9 @@
 (defn make-texture-drawable
   [name]
   (TextureRegionDrawable. (TextureRegion. (.get manager name Texture))))
+
+(defn make-texture-drawable-flip
+  [name flip-x? flip-y?]
+  (let [tr (TextureRegion. (.get manager name Texture))]
+    (.flip tr flip-x? flip-y?)
+    (TextureRegionDrawable. tr)))

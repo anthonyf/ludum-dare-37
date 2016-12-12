@@ -49,9 +49,9 @@
      borderopacity="1"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="397.54211"
-     inkscape:cy="497.74106"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="319.4703"
+     inkscape:cy="487.63094"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -562,7 +562,9 @@
       </g>
     </g>
     <g
-       id="tail">
+       id="tail"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <rect
          y="604.36243"
          x="192"
