@@ -13,7 +13,9 @@
          :snake (list start-xy
                       [(+ 1 start-x) start-y]
                       [(+ 2 start-x) start-y])
-         :food nil}
+         :food nil
+         :grow-by 2
+         :grow 0}
         spawn-food)))
 
 #_ (setup-game)
@@ -67,15 +69,22 @@
                 (contains? (set snake) new-head))
           ;; ran into something, die
           (assoc game :state :dead)
-          (-> (if (= food head)
-                (-> game
-                    (assoc :food nil)
-                    (assoc :snake (concat [new-head]
-                                          snake))
-                    spawn-food)
-                (-> game
-                    (assoc :snake (concat [new-head]
-                                          (butlast snake)))))
+          (-> game
+              ((fn [{:keys [grow-by] :as game}]
+                 (if (= food head)
+                   (-> game
+                       (assoc :food nil)
+                       (update :grow (fn [grow] (+ grow grow-by)))
+                       spawn-food)
+                   game)))
+              ((fn [{:keys [grow] :as game}]
+                 (if (> grow 0)
+                   (-> game
+                       (assoc :snake (concat [new-head]
+                                             snake))
+                       (update :grow dec))
+                   (assoc game :snake (concat [new-head]
+                                              (butlast snake))))))
               (assoc :direction direction)))))
     game))
 

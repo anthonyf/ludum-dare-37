@@ -18,7 +18,8 @@
   - [x] cat paws sometimes spin around
 
 * Stretch goals
-  - [ ] make cat grow faster
+  - [x] make cat grow faster
+  - [ ] hair balls (as obstacles or bonus score)
   - [ ] outer walls
   - [ ] cat animation on title screen
   - [ ] animate title menu text (zoom and rotate)
@@ -28,5 +29,4 @@
   - [ ] animate spider (hands up/down or dancing)
   - [ ] animate cat eating
   - [ ] obstacles
-  - [ ] hair balls (as obstacles or bonus score)
   - [ ] nine lives
