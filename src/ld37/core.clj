@@ -17,6 +17,7 @@
              ["images/straight.png" Texture]
              ["images/turn.png" Texture]
              ["images/tail.png" Texture]
+             ["images/paws.png" Texture]
              ["images/spider.png" Texture]
              ["images/crash.png" Texture]])
 

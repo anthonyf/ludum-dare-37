@@ -170,7 +170,13 @@
 
 (defn make-paws-actor!
   [game]
-  (proxy [Group] []))
+  (let [paws (proxy [Image] [(am/make-texture-drawable "images/paws.png")]
+               (act [delta]
+                 (let [{:keys [snake]} @game
+                       [pos-x pos-y :as pos] (nth snake 1)]
+                   (c/set-actor-game-position this pos))
+                 (proxy-super act delta)))]
+    paws))
 
 (defn make-cat-actor!
   [game]
@@ -190,7 +196,7 @@
                           ;; add body tiles
                           (reset! body-tiles (make-body-tiles! game))
                           (doseq [body-tile @body-tiles]
-                            (.addActorBefore this head body-tile))))
+                            (.addActorBefore this paws-actor body-tile))))
                       (proxy-super act delta)))]
     (.addActor cat-actor tail)
     (.addActor cat-actor paws-actor)
