@@ -3,7 +3,8 @@
                                             Group)
            (com.badlogic.gdx.scenes.scene2d.ui Image))
   (:require [ld37.asset-manager :as am]
-            [ld37.common :as c]))
+            [ld37.common :as c]
+            [ld37.jukebox :as j]))
 
 (defn make-hairball
   []
@@ -26,6 +27,7 @@
                                                  (c/set-actor-game-position hairball-actor hairball )
                                                  (.addActor this hairball-actor)
                                                  hairball-actor))
-                                             hairballs)))
+                                             hairballs))
+                                (j/play-sound :hairball))
                               (proxy-super act delta))))]
     hairballs-actor))

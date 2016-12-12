@@ -281,9 +281,7 @@
                                     (< pos-x next-x)
                                     (> head-y pos-y)
                                     (= pos-y next-y))
-                               (rotate-and-move-to this 270 pos)
-
-                               :else (println "unhandled case" head-pos pos next-pos)))))
+                               (rotate-and-move-to this 270 pos)))))
                  (proxy-super act delta)))]
     (c/set-actor-game-position paws pos)
     paws))

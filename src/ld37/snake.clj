@@ -59,9 +59,9 @@
       game)))
 
 (defn- spawn-hairball
-  [{:keys [direction]
-    [[head-x head-y :as head-pos] & _] :snake
-    :as game}]
+  [{[[head-x head-y :as head-pos] & _] :snake
+    :as game}
+   direction]
   (let [valid-positions (filter (fn [[x y :as pos]]
                                   (and (empty-place? game pos)
                                        (not= pos (case direction
@@ -79,10 +79,11 @@
         (update game :hairballs conj hairball-pos)))))
 
 (defn- update-hairballs
-  [{:keys [hairball-delay hairball-countdown hairballs] :as game}]
+  [{:keys [hairball-delay hairball-countdown hairballs] :as game}
+   direction]
   (let [spawn? (zero? hairball-countdown)]
     (cond-> game
-      spawn? (-> spawn-hairball
+      spawn? (-> (spawn-hairball direction)
                  (assoc :hairball-countdown (+ hairball-delay (rand-int hairball-delay))))
       (not spawn?) (-> (update :hairball-countdown dec)))))
 
@@ -116,6 +117,7 @@
 
           ;; otherwise
           (-> game
+              (update-hairballs direction)
               eat-food
               ((fn [{:keys [grow] :as game}]
                  (if (> grow 0)
@@ -125,7 +127,6 @@
                        (update :grow dec))
                    (assoc game :snake (concat [new-head]
                                               (butlast snake))))))
-              update-hairballs
               (assoc :direction direction)))))
     game))
 
