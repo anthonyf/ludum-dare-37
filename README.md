@@ -1,36 +1,21 @@
 # ld37
 
-FIXME: description
 
-## Installation
 
-Download from http://example.com/FIXME.
+## Todo
 
-## Usage
+* MVP
+  - [x] basic game working
+  - [x] cat tiles rendering
+  - [ ] title screen
+  - [ ] game over screen
+  - [ ] score
+  - [ ] leader board
 
-FIXME: explanation
-
-    $ java -jar ld37-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2016 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+* Stretch goals
+  - [ ] make cat grow faster
+  - [ ] animate spider (hands up/down or dancing)
+  - [ ] animate cat eating
+  - [ ] obstacles
+  - [ ] hair balls (as obstacles or bonus score)
+  - [ ] nine lives
